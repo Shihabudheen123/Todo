@@ -9,11 +9,8 @@ const Todo = () => {
   const [todos, setTodos] = useState([]);
 
   const addTodo = () => {
-    const newTodo = {
-      id: Date.now(),
-      text: todo,
-    };
-    setTodos([...todos, newTodo]);
+ 
+    setTodos([...todos, {list:todo,id:Date.now() , status:false}]);
     setTodo("");
   };
   const handleSubmit = (e) => {
@@ -23,6 +20,21 @@ const Todo = () => {
   useEffect(() => {
     inputRef.current.focus();
   });
+
+  const onDelete = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const onComplete = (id) =>{
+
+    const complete = todos.map((list)=>{
+      if(list.id === id){
+        return ({...list,status:!list.status})
+      }
+      return list
+    })
+setTodos(complete)
+  }
   return (
     <div className="container">
       <h2>Todo App</h2>
@@ -41,18 +53,20 @@ const Todo = () => {
         <ul>
           {todos.map((todo) => (
             <li className="list-items" key={todo.id}>
-              <div className="list-item-list">{todo.text}</div>
+              <div className="list-item-list" id={todo.status ? "list-item" : ''}>{todo.list}</div>
               <span>
                 <IoMdDoneAll
                   className="list-item-icons"
                   id="complete"
                   title="Complete"
+                  onClick={()=>onComplete(todo.id)}
                 />
                 <FiEdit className="list-item-icons" id="edit" title="Edit" />
                 <MdDelete
                   className="list-item-icons"
                   id="delete"
                   title="Delete"
+                  onClick={() => onDelete(todo.id)}
                 />
               </span>
             </li>
