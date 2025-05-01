@@ -7,11 +7,26 @@ import { MdDelete } from "react-icons/md";
 const Todo = () => {
   const [todo, setTodo] = useState("");
   const [todos, setTodos] = useState([]);
+  const [editId, setEditId]=useState(0);
 
   const addTodo = () => {
- 
-    setTodos([...todos, {list:todo,id:Date.now() , status:false}]);
-    setTodo("");
+   if(todo !== "") {
+     
+      setTodos([...todos, { list: todo, id: Date.now(), status: false }]);
+      setTodo("");
+    }else{
+      alert("Please enter a task");
+    }
+
+    if(editId) {
+      const editTodo = todos.find((todo)=>todo.id === editId )
+      const updateTodo = todos.map((to) => to.id === editTodo.id 
+    ? (to = {id:to.id,list:todo})
+  :(to = {id:to.id,list:to.list}))
+  setTodos(updateTodo)
+  setEditId(0)
+  setTodo("")
+    }
   };
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,15 +40,20 @@ const Todo = () => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  const onComplete = (id) =>{
-
-    const complete = todos.map((list)=>{
-      if(list.id === id){
-        return ({...list,status:!list.status})
+  const onComplete = (id) => {
+    const complete = todos.map((list) => {
+      if (list.id === id) {
+        return { ...list, status: !list.status };
       }
-      return list
-    })
-setTodos(complete)
+      return list;
+    });
+    setTodos(complete);
+  };
+
+  const onEdit = (id) => {
+    const editTodo = todos.find((to)=> to.id === id)
+    setTodo(editTodo.list)
+    setEditId(editTodo.id)
   }
   return (
     <div className="container">
@@ -47,21 +67,31 @@ setTodos(complete)
           className="form-control"
           onChange={(event) => setTodo(event.target.value)}
         />
-        <button onClick={addTodo}>ADD</button>
+        <button onClick={addTodo}>{editId ? 'EDIT' : 'ADD'}</button>
       </form>
       <div className="list">
         <ul>
           {todos.map((todo) => (
             <li className="list-items" key={todo.id}>
-              <div className="list-item-list" id={todo.status ? "list-item" : ''}>{todo.list}</div>
+              <div
+                className="list-item-list"
+                id={todo.status ? "list-item" : ""}
+              >
+                {todo.list}
+              </div>
               <span>
                 <IoMdDoneAll
                   className="list-item-icons"
                   id="complete"
                   title="Complete"
-                  onClick={()=>onComplete(todo.id)}
+                  onClick={() => onComplete(todo.id)}
                 />
-                <FiEdit className="list-item-icons" id="edit" title="Edit" />
+                <FiEdit
+                  className="list-item-icons"
+                  id="edit"
+                  title="Edit"
+                  onClick={() => onEdit(todo.id)}
+                />
                 <MdDelete
                   className="list-item-icons"
                   id="delete"
